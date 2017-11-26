@@ -303,8 +303,8 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
   }
   else
   {
-    src = cloud_src;
-    tgt = cloud_tgt;
+    *src = *cloud_src;
+    *tgt = *cloud_tgt;
   }
 
 
@@ -407,12 +407,12 @@ int main (int argc, char** argv)
   PointCloud::Ptr result (new PointCloud), source, target;
   Eigen::Matrix4f GlobalTransform = Eigen::Matrix4f::Identity (), pairTransform;
   PointCloud::Ptr temp (new PointCloud);
-  PointCloud::Ptr final (new PointCloud);
+  PointCloud::Ptr finalcloud (new PointCloud);
   for (size_t i = 1; i < data.size (); ++i)
   {
     source = data[i-1].cloud;
     target = data[i].cloud;      
-    final=data[0].cloud;
+    *finalcloud=*source;
     PointCloud::Ptr init_result (new PointCloud);
     *init_result = *target;
     Eigen::Matrix4f init_transform = Eigen::Matrix4f::Identity ();
@@ -421,7 +421,7 @@ int main (int argc, char** argv)
     pairAlign (source, init_result, temp, pairTransform, true);
     pairTransform*=init_transform;   
     pcl::transformPointCloud (*temp, *result, GlobalTransform);
-    *final+=*result;
+    *finalcloud+=*result;
     
     GlobalTransform = GlobalTransform * pairTransform;
     cout<<"粗+精变换:\n"<<GlobalTransform<<endl;
